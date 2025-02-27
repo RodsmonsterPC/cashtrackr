@@ -14,7 +14,7 @@ export const authenticate = async (req:Request, res: Response, next: NextFunctio
     const bearer = req.headers.authorization
 
   if(!bearer){
-    const error = new Error('No autorizaod')
+    const error = new Error('No autorizado')
 
     res.status(401).json({error: error.message})
     return
