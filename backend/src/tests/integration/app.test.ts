@@ -4,8 +4,7 @@ import { AuthController } from "../../controllers/AuthController";
 import User from "../../models/Users";
 import * as authUtils from '../../util/auth'
 import * as jwtUtils from '../../util/jws'
-import { check } from "express-validator";
-import { toWeb } from "form-data";
+
 
 describe('Authentication - Create Account', () => {
 
@@ -372,7 +371,7 @@ describe('GET /api/budgets', () => {
     it('should allow authenticate to budgets with a valid jwt', async () => {
         
         const response = await request(server)
-                                       .get('/api/budgets/1')
+                                       .get('/api/budgets')
                                         .auth(jwt, {type: 'bearer'})
 
         
@@ -410,6 +409,20 @@ describe('POST /api/budgets', () => {
         expect(response.status).toBe(400)
         expect(response.body.errors).toHaveLength(4)
     })
+
+    it('should create a budget if the user is authenticate with a 200 code sucess', async () => {
+        const response = await request(server)
+                                       .post('/api/budgets')
+                                       .auth(jwt, {type: 'bearer'})
+                                       .send({
+                                        name: "Gastos",
+                                        amount: 3000
+                                       })
+                                       
+  
+        expect(response.status).toBe(201)
+        
+    })
   
 })
 
@@ -419,9 +432,9 @@ describe('Get /api/budgets/:id', () => {
         await authenticateUser()
   })
 
-  it('should reject authenticate get request to budget id withour a jwt', async () => {
+  it('should reject authenticate get request to budget id without a jwt', async () => {
       const response = await request(server)
-                                     .get('/api/budgets/1')
+                                     .post('/api/budgets/1')
                                      
 
       expect(response.status).toBe(401)
@@ -511,6 +524,46 @@ it('should update a budget by id and return a success message', async () => {
 
     expect(response.status).toBe(200)
     expect(response.body).toBe("Presupuesto actualizado correctamente")
+
+})
+
+})
+
+describe('DELETE /api/budgets/:id', () => {
+    beforeAll(async () => {
+        await authenticateUser()
+  })
+
+  it('should reject authenticate delete request to budget id withour a jwt', async () => {
+      const response = await request(server)
+                                     .delete('/api/budgets/1')
+                                     
+
+      expect(response.status).toBe(401)
+      expect(response.body.error).toBe('No autorizado')
+  })
+
+
+  it('should return 404 not found when a budget doesnt exists', async () => {
+    const response = await request(server)
+                                   .delete('/api/budgets/300')
+                                   .auth(jwt, {type: 'bearer'})
+                                  
+                                   
+
+    expect(response.status).toBe(404)
+    expect(response.body.error).toBe('Presupuesto no encontrado')
+  
+
+})
+
+it('should delete a budget by id and return a success message', async () => {
+    const response = await request(server)
+                                   .delete('/api/budgets/1')
+                                   .auth(jwt, {type: 'bearer'})                             
+
+    expect(response.status).toBe(200)
+    expect(response.body).toBe("Presupuesto eliminado correctamente")
 
 })
 
