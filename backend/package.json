@@ -10,7 +10,7 @@
     "start": "node ./dist/index.js",
     "test": "jest",
     "test:coverage": "npm run pretest && jest --coverage",
-    "pretest":"ts-node ./src/data --clear"
+    "pretest": "ts-node ./src/data --clear"
   },
   "author": "RodsMosnterPc",
   "license": "ISC",
