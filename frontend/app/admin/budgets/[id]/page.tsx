@@ -1,5 +1,8 @@
+import ProgressBar from "@/components/budgets/ProgressBar";
 import AddExpenseButton from "@/components/expenses/AddExpenseButton";
 import ExpenseMenu from "@/components/expenses/ExpenseMenu";
+import AmountInfo from "@/components/ui/AmountInfo";
+
 import ModalContainer from "@/components/ui/ModalContainer";
 import getBudgetById from "@/src/services/budget";
 import { formatDate } from "@/src/utils";
@@ -28,6 +31,12 @@ const BudgetDetailPage = async ({
 
   const budget = await getBudgetById(resolvedParams.id);
 
+  const totalSpent = budget.expenses.reduce((total, expense) => +expense.amount + total, 0)
+
+  const totalAvailbale = +budget.amount - totalSpent
+
+  const percentage = Math.round((totalSpent / Number(budget.amount)) * 100)
+
   return (
     <>
       <div className="flex justify-between items-center">
@@ -42,6 +51,25 @@ const BudgetDetailPage = async ({
 
       {budget.expenses.length ? (
         <>
+          <div className="grid grid-cols-1 md:grid-cols-2 mt-10">
+            <ProgressBar percentage={percentage}/>
+            <div className="flex flex-col justify-center items-center md:items-start gap-5">
+            <AmountInfo
+            label='Presupuesto'
+            amount={+budget.amount}
+            />
+            <AmountInfo
+            label='Disponible'
+            amount={totalAvailbale}
+            />
+            <AmountInfo
+            label='Gastado'
+            amount={totalSpent}
+            />
+            
+            </div>
+          </div>
+
           <h1 className="font-black  text-4xl text-purple-950 mt-10 ">
             Gastos en este presupuesto
           </h1>
