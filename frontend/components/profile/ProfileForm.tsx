@@ -1,12 +1,33 @@
 "use client"
 
-export default function ProfileForm() {
+import { updateUser } from "@/actions/update-user-action"
+import { User } from "@/src/schemas"
+import { useActionState, useEffect } from "react"
+import ErrorMessage from "../ui/ErrorMessage"
+import { toast } from "react-toastify"
+
+export default function ProfileForm({user} : {user : User}) {
+
+  const [ state, dispatch ] = useActionState(updateUser,{
+    errors: [],
+    success:""
+  })
+
+
+  useEffect(() => {
+    if(state.success){
+      toast.success(state.success)
+    }
+  }, [state])
+
   return (
     <>
       <form
         className=" mt-14 space-y-5"
         noValidate
+        action={dispatch}
       >
+        {state.errors.map(error => <ErrorMessage>{error}</ErrorMessage>)}
         <div className="flex flex-col gap-5">
           <label
             className="font-bold text-2xl"
@@ -16,6 +37,7 @@ export default function ProfileForm() {
             placeholder="Tu Nombre"
             className="w-full border border-gray-300 p-3 rounded-lg"
             name="name"
+            defaultValue={user.name}
           />
         </div>
         <div className="flex flex-col gap-5">
@@ -29,6 +51,7 @@ export default function ProfileForm() {
             placeholder="Tu Email"
             className="w-full border border-gray-300 p-3 rounded-lg"
             name="email"
+            defaultValue={user.email}
           />
         </div>
 

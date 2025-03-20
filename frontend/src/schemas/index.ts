@@ -91,6 +91,14 @@ message: "Los Passwords no son iguales",
 path: ["password_confirmation"]
 });
 
+export const ProfileFormSchema = z.object({
+  name: z.string()
+          .min(1, {message: 'Tu Nombre no puede ir vacio'}),
+  email: z.string()
+          .min(1, {message: 'El Email es Obligatorio'})
+          .email({message: 'Email no válido'}),
+})
+
 export const ExpenseAPIResponseSchema = z.object({
   id: z.number(),
   name:z.string(),

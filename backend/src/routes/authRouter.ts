@@ -23,9 +23,7 @@ router.post(
 router.post(
   "/confirm-account",
   limiter,
-  body("token")
-    .isLength({ min: 6, max: 6 })
-    .withMessage("Token no válido"),
+  body("token").isLength({ min: 6, max: 6 }).withMessage("Token no válido"),
   handleInputErrors,
   AuthController.confirmAccount
 );
@@ -55,39 +53,51 @@ router.post(
   AuthController.validateToken
 );
 
-router.post('/reset-password/:token',
-    param("token")
+router.post(
+  "/reset-password/:token",
+  param("token")
     .notEmpty()
     .isLength({ min: 6, max: 6 })
     .withMessage("Token no válido"),
-    body("password")
+  body("password")
     .isLength({ min: 8 })
     .withMessage("El password es muy corto mínimo 8 caracteres"),
-    handleInputErrors,
-    AuthController.resetPasswordWithToken
-)
+  handleInputErrors,
+  AuthController.resetPasswordWithToken
+);
 
-router.get('/user', authenticate, AuthController.user)
+router.get("/user", authenticate, AuthController.user);
 
-router.post('/update-password', 
-    authenticate,
-    body("current_password")
+router.post(
+  "/update-password",
+  authenticate,
+  body("current_password")
     .notEmpty()
     .withMessage("El password actual no puede ir vacio"),
-    body("password")
+  body("password")
     .isLength({ min: 8 })
     .withMessage("El password nuevo es muy corto, mínimo 8 caracteres"),
-    handleInputErrors,
-    AuthController.updateCurrentUserPassword
-)
+  handleInputErrors,
+  AuthController.updateCurrentUserPassword
+);
 
-router.post('/check-password', 
-    authenticate,
-    body("password")
+router.post(
+  "/check-password",
+  authenticate,
+  body("password")
     .notEmpty()
     .withMessage("El password actual no puede ir vacio"),
-    handleInputErrors,
-    AuthController.checkPassword
-)
+  handleInputErrors,
+  AuthController.checkPassword
+);
+
+router.patch(
+  "/user",
+  authenticate,
+  body("name").notEmpty().withMessage("El nombre no puede ir vacio"),
+  body("email").isEmail().withMessage("Email no valido"),
+  handleInputErrors,
+  AuthController.updateUser
+);
 
 export default router;

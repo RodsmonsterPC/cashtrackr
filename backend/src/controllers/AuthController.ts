@@ -154,30 +154,6 @@ export class AuthController {
   static user = async (req: Request, res: Response) => {
     res.json(req.user);
   };
-
-  static updateCurrentUserPassword = async (req: Request, res: Response) => {
-    const { current_password, password } = req.body;
-
-    const { id } = req.user;
-
-    const user = await User.findByPk(id);
-
-    const isPasswordCorrect = await checkPassword(
-      current_password,
-      user.password
-    );
-
-    if (!isPasswordCorrect) {
-      const error = new Error("EL pasword actual es incorrecto");
-      res.status(401).json({ error: error.message });
-      return;
-    }
-
-    user.password = await hashPassword(password);
-    await user.save();
-
-    res.json("El password se actualizo correctamente");
-  };
   static checkPassword = async (req: Request, res: Response) => {
     const { password } = req.body;
 
@@ -194,5 +170,55 @@ export class AuthController {
     }
 
     res.json("Password correcto");
+  };
+
+  static updateCurrentUserPassword = async (req: Request, res: Response) => {
+    const { current_password, password } = req.body;
+
+    const { id } = req.user;
+
+    const user = await User.findByPk(id);
+
+    const isPasswordCorrect = await checkPassword(
+      current_password,
+      user.password
+    );
+
+    if (!isPasswordCorrect) {
+      const error = new Error("El pasword actual es incorrecto");
+      res.status(401).json({ error: error.message });
+      return;
+    }
+
+    user.password = await hashPassword(password);
+    await user.save();
+
+    res.json("El password se actualizo correctamente");
+  };
+
+  static updateUser = async (req: Request, res: Response) => {
+    
+    const { name, email } = req.body;
+    
+    try {
+
+      //Prevenir duplicados
+
+      const existingUser = await User.findOne({ where: { email } });
+
+      if (existingUser && existingUser.id !== req.user.id) {
+        const error = new Error("Ese email, ya esta registrado por otro usuario");
+        res.status(409).json({ error: error.message });
+        return;
+      }
+      
+      await User.update({email, name}, {
+        where: {id: req.user.id}
+      })
+
+      res.json("Los datos se actualizaron correctamente");
+    } catch (error) {
+      res.status(500).json("Hubo un error");
+    }
   };
 }
